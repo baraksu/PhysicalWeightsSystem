@@ -6,12 +6,16 @@ m1 db 0     ;main vars
 m2 db 0
 t1 db 0
 meu1 db 0
-a db ?      ;
+a db ?
+v0 db 0
+v1 db ?
+xx1 db 0
+xx2 db ?      ;
 
 msg1 db "enter m1 (3 digit,max number:255):","$"
 msg2 db 13,10,"enter m2 (3 digits,max number:255):","$"
-msg3 db 13,10,"enter t1 (3 digits,max number:255):","$"
 msg4 db 13,10,"enter meu1 (3 digits,max number:255):","$"
+msg3 db "a=0,No movement will occur","$"
 
  x_center dw ?         ;vars of circle
  y_center dw ?
@@ -25,45 +29,72 @@ msg4 db 13,10,"enter meu1 (3 digits,max number:255):","$"
     w dw ?
     h dw ?            ;
     
+    xline dw ?
+    yline dw ?
+    wline dw ?
+    
+    xcolumn dw ?
+    ycolumn dw ?
+    hcolumn dw ?
+    
+    xright_square dw ?
+    yright_square dw ?
+    wright_square dw ?
+    hright_square dw ?   
+    
+    xleft_square dw ?
+    yleft_square dw ?
+    wleft_square dw ?
+    hleft_square dw ?  
+    
     TempW dw ?        ;diagonal line Vars
     pointX dw ? 
     pointY dw ?
     point1X dw ? 
     point1Y dw ?
     point2X dw ? 
-    point2Y dw ?      ; 
+    point2Y dw ?
     
-    
+    x dw ?
 .CODE
+	
 
 drawline proc
-    mov cx, [x1]
-    add cx,[w]  ; column
-    mov dx, [y1]     ; row
+        push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP     
+    
+    mov cx, [bp+8]
+    add cx,[bp+4]  ; column
+    mov dx, [bp+6]     ; row
     mov al, [color]    
 line: mov ah, 0ch    ; put pixel
     int 10h
     
     dec cx
-    cmp cx, [x1]
+    cmp cx, [bp+8]
     ja line        
     
-    ret
+    POP BP          ; restore BP from stack
+    RET 6           ; return from the function and clean up the stack 
 drawline endp
 
 drawcolumn proc
-    mov cx, [x1]    ; column
-    mov dx, [y1]
-    add dx,[h]   ; row
+            push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP   
+    
+    mov cx, [bp+8]    ; column
+    mov dx, [bp+6]
+    add dx,[bp+4]   ; row
     mov al, [color]     ; white
 column: mov ah, 0ch    ; put pixel
     int 10h
     
     dec dx
-    cmp dx, [y1]
+    cmp dx, [bp+6]
     ja column
     
-    ret
+    pop bp
+    ret 6
 drawcolumn endp
 
 circle proc
@@ -179,61 +210,67 @@ ret
  
   blank_square proc  
     
-    mov cx, [x1]
-    add cx,[w]  ; column
-    mov dx, [y1]     ; row
+    push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP     
+     
+    mov cx, [bp+10]
+    add cx,[bp+6]  ; column
+    mov dx, [bp+8]     ; row
     mov al, [color]    
 u1: mov ah, 0ch    ; put pixel
     int 10h
     
     dec cx
-    cmp cx, [x1]
+    cmp cx, [bp+10]
     ja u1
  
 ; draw bottom line:
 
-    mov cx, [x1]
-    add cx,[w]  ; column
-    mov dx, [y1]
-    add dx,[h]   ; row
+    mov cx, [bp+10]
+    add cx,[bp+6]  ; column
+    mov dx, [bp+8]
+    add dx,[bp+4]   ; row
     mov al, [color]     ; white
 u2: mov ah, 0ch    ; put pixel
     int 10h
     
     dec cx
-    cmp cx, [x1]
+    cmp cx, [bp+10]
     ja u2
  
 ; draw left line:
 
-    mov cx, [x1]    ; column
-    mov dx, [y1]
-    add dx,[h]   ; row
+    mov cx, [bp+10]    ; column
+    mov dx, [bp+8]
+    add dx,[bp+4]   ; row
     mov al, [color]     ; white
 u3: mov ah, 0ch    ; put pixel
     int 10h
     
     dec dx
-    cmp dx, [y1]
+    cmp dx, [bp+8]
     ja u3 
     
     
 ; draw right line:
 
-    mov cx, [x1]
-    add cx,[w]  ; column
-    mov dx, [y1]
-    add dx,[h]   ; row
+    mov cx, [bp+10]
+    add cx,[bp+6]  ; column
+    mov dx, [bp+8]
+    add dx,[bp+4]   ; row
     mov al, [color]     ; white
 u4: mov ah, 0ch    ; put pixel
     int 10h
     
     dec dx
-    cmp dx, [y1]
-    ja u4     
- 
-     ret
-    blank_square endp 
+    cmp dx, [bp+8]
+    ja u4
+         
+    POP BP          ; restore BP from stack
+    RET 8           ; return from the function and clean up the stack 
+    blank_square endp
+  
+  
 Macro DrawLine2DDY p1X, p1Y, p2X, p2Y
 	local l1, lp, nxt
 	mov dx, 1
@@ -419,6 +456,10 @@ PROC PIXEL
 ENDP PIXEL
 
  
+
+
+
+
 start:
     MOV AX, @DATA   ; initialize data segment
     MOV DS, AX
@@ -458,23 +499,6 @@ input_m2:
     mov m2,al
     loop input_m2
 	
-output_t1:
-    lea dx, msg3
-    mov ah, 09h
-    int 21h
-    mov cx,3       
-input_t1:
-	mov ah, 01h
-	int 21h
-	sub al,30h
-	mov dl,al
-	mov al,byte ptr t1
-    mov bl,10
-    mul bl
-    xor ah,ah
-    add ax,dx
-    mov t1,al
-    loop input_t1
 output_meu1:	
 	lea dx, msg4
     mov ah, 09h
@@ -493,6 +517,11 @@ input_meu1:
     mov meu1,al
     loop input_meu1
 	
+	mov al,m2
+	mov bl,10
+	mul bl
+	mov t1,al
+	
     mov al,m1
     mov bl,10
     mul bl
@@ -502,15 +531,17 @@ input_meu1:
     mov al,t1
     sub ax,dx
     mov bl,m1
-    div bl
+    idiv bl
     mov a,al  ;;calculate a
+
     
+    drawing:
      mov ah,0 ;subfunction 0
     mov al,13H ;select mode 13h 
     int 10h ;call graphics interrupt
     
     mov [x_center],230
-    mov [y_center],70 
+    mov [y_center],90 
     mov [x_value],7  ;radius 
     mov [y_value],0
     mov [color],14
@@ -520,27 +551,160 @@ input_meu1:
    mov [y1], 100
    mov [w],200
    mov [h],99
+   push x1
+   push y1
+   push w
+   push h
    call blank_square 
  
 	mov [point1X], 230
 	mov [point2X], 200
-	mov [point1Y], 70
+	mov [point1Y], 90
 	mov [point2Y], 100
 	call DrawLine2D
     
-   mov [x1], 50
-   mov [y1], 70
-   mov [w],180
+   mov [xline], 50
+   mov [yline], 90
+   mov [wline],180 
+   push xline
+   push yline
+   push wline
    call drawline
     
-   mov [x1], 230
-   mov [y1], 70
-   mov [h],40
+   mov [xcolumn], 230
+   mov [ycolumn], 90
+   mov [hcolumn],20
+      push xcolumn
+   push ycolumn
+   push hcolumn
    call drawcolumn   
    
+   mov [xright_square], 11
+   mov [yright_square], 80
+   mov [wright_square],40
+   mov [hright_square],19
+   push xright_square
+   push yright_square
+   push wright_square
+   push hright_square
+   call blank_square 
+      
+   mov [xleft_square],210
+   mov [yleft_square],110
+   mov [wleft_square],40
+   mov [hleft_square],19
+   push xleft_square
+   push yleft_square
+   push wleft_square
+   push hleft_square
+   call blank_square
    
+   Redraw:
+    ; is key press    
+    mov ah,01h
+    int 16h
+    
+    jz Redraw
+    ; Get the pressed key
+    mov ah,00h
+    int 16h
+    cmp ah,39h
+    jne Redraw 
+;-------------------------------------------------
+cmp a,0
+je error1         
+moving:
+   mov al,a
+   mov bl,2
+   xor ah,ah
+   div bl
+   add al,v0
+   mov byte ptr x,al
+   push xline
+   push yline
+   push wline
+   mov [color],0h
+   call drawline
+   
+      mov dx,x 
+   add xline,dx
+   sub wline,dx 
+   add wline,1
+   push xline
+   push yline
+   push wline 
+   mov [color],14
+   call drawline 
+    
+   push xright_square
+   push yright_square
+   push wright_square
+   push hright_square
+   mov [color],0h 
+   call blank_square
+   mov ax,x
+   xor ah,ah
+   add xright_square,ax
+   push xright_square
+   push yright_square
+   push wright_square
+   push hright_square
+   mov [color],14 
+   call blank_square 
+   
+   
+   
+   push xleft_square
+   push yleft_square
+   push wleft_square
+   push hleft_square
+   mov [color],0h 
+   call blank_square
+   
+   mov al,byte ptr x
+   mov bl,2
+   xor ah,ah
+   div bl
+      xor ah,ah
+   add yleft_square,ax
+   push xleft_square
+   push yleft_square
+   push wleft_square
+   push hleft_square
+   mov [color],14 
+   call blank_square
+   
+   mov al,byte ptr x
+   mov bl,2
+   xor ah,ah
+   div bl
+   xor ah,ah
+   add hcolumn,ax
+   push xcolumn
+   push ycolumn
+   push hcolumn
+   call drawcolumn   
+   mov al,a
+   add v0,al
+   mov ax,yleft_square
+   add ax,hleft_square
+   cmp ax,160
+   jb moving    
+   jmp exit
+   
+error1:   
+   	mov al, 13h
+	mov ah, 3
+	int 10h
+	
+	lea dx, msg3
+    mov ah, 09h
+    int 21h   
+exit:      
     ; exit program
     MOV AH, 4CH
     INT 21H
 END start
+
+         
 
