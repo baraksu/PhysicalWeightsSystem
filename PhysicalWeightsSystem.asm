@@ -15,7 +15,7 @@ xx2 db ?      ;
 msg1 db "enter m1 (3 digit,max number:255):","$"
 msg2 db 13,10,"enter m2 (3 digits,max number:255):","$"
 msg4 db 13,10,"enter meu1 (3 digits,max number:255):","$"
-msg3 db "a=0,No movement will occur","$"
+msg3 db "a=0,No movement will occur","$" 
 
  x_center dw ?         ;vars of circle
  y_center dw ?
@@ -517,22 +517,29 @@ input_meu1:
     mov meu1,al
     loop input_meu1
 	
-	mov al,m2
-	mov bl,10
-	mul bl
-	mov t1,al
-	
-    mov al,m1
+    mov al,m2
     mov bl,10
+    mul bl
+    mov dl,al
+    mov al,m1
     mul bl
     mov bl,meu1
     mul bl
-    mov dx,ax
-    mov al,t1
-    sub ax,dx
+    sub dl,al
+    mov al,dl
     mov bl,m1
+    add bl,m2
     idiv bl
-    mov a,al  ;;calculate a
+    mov a,al
+    
+    mov al,10
+    sub al,a
+    mov bl,m2
+    mul bl
+    mov t1,al
+    
+    
+    
 
     
     drawing:
@@ -612,7 +619,7 @@ input_meu1:
     jne Redraw 
 ;-------------------------------------------------
 cmp a,0
-je error1         
+je error1
 moving:
    mov al,a
    mov bl,2
@@ -628,8 +635,7 @@ moving:
    
       mov dx,x 
    add xline,dx
-   sub wline,dx 
-   add wline,1
+   sub wline,dx
    push xline
    push yline
    push wline 
@@ -661,11 +667,7 @@ moving:
    mov [color],0h 
    call blank_square
    
-   mov al,byte ptr x
-   mov bl,2
-   xor ah,ah
-   div bl
-      xor ah,ah
+   mov ax,x
    add yleft_square,ax
    push xleft_square
    push yleft_square
@@ -674,11 +676,7 @@ moving:
    mov [color],14 
    call blank_square
    
-   mov al,byte ptr x
-   mov bl,2
-   xor ah,ah
-   div bl
-   xor ah,ah
+   mov ax,x
    add hcolumn,ax
    push xcolumn
    push ycolumn
@@ -686,9 +684,14 @@ moving:
    call drawcolumn   
    mov al,a
    add v0,al
-   mov ax,yleft_square
-   add ax,hleft_square
-   cmp ax,160
+   mov al,a
+   mov bl,2
+   xor ah,ah
+   div bl
+   xor ah,ah
+   add al,v0
+   add ax,yleft_square
+   cmp ax,191
    jb moving    
    jmp exit
    
@@ -699,12 +702,14 @@ error1:
 	
 	lea dx, msg3
     mov ah, 09h
-    int 21h   
+    int 21h 
 exit:      
     ; exit program
     MOV AH, 4CH
     INT 21H
 END start
+
+                   
 
          
 
