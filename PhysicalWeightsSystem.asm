@@ -37,15 +37,15 @@ msg5 db 13,10,"invalid input$"
     ycolumn dw ?
     hcolumn dw ?
     
-    xright_square dw ?
-    yright_square dw ?
-    wright_square dw ?
-    hright_square dw ?   
-    
     xleft_square dw ?
     yleft_square dw ?
     wleft_square dw ?
-    hleft_square dw ?  
+    hleft_square dw ?   
+    
+    xright_square dw ?
+    yright_square dw ?
+    wright_square dw ?
+    hright_square dw ?  
     
     TempW dw ?        ;diagonal line Vars
     pointX dw ? 
@@ -477,19 +477,19 @@ start:
     mov cx,2         ;show msg1
 input_m1:
 	mov ah, 01h
-	int 21h 
-    cmp al,30h
+	int 21h
+	cmp al,30h
     jb error2
     cmp al,39h 
     ja error2
 	sub al,30h
-    mov m1,al
 	mov dl,al
 	mov al,byte ptr m1
     mov bl,10
     mul bl
     xor ah,ah
     add ax,dx
+    mov m1,al
     loop input_m1
 output_m2:    
     lea dx, msg2
@@ -538,18 +538,19 @@ input_meu1:
     mov al,m2
     mov bl,10
     mul bl
-    mov dx,ax
+    mov cx,ax
     mov al,m1
     mul bl
     mov bl,meu1
-    mul bl
-    cmp ax,dx
+    xor bh,bh
+    mul bx
+    cmp ax,cx
     ja minus
-    sub dx,ax
-    mov ax,dx
+    sub cx,ax
+    mov ax,cx
     mov bl,m1
     add bl,m2
-    idiv bl
+    div bl
     mov a,al
     
     mov al,10
@@ -607,24 +608,24 @@ mov a,0
    push hcolumn
    call drawcolumn   
    
-   mov [xright_square], 11
-   mov [yright_square], 80
-   mov [wright_square],40
-   mov [hright_square],19
-   push xright_square
-   push yright_square
-   push wright_square
-   push hright_square
-   call blank_square 
-      
-   mov [xleft_square],210
-   mov [yleft_square],110
+   mov [xleft_square], 11
+   mov [yleft_square], 80
    mov [wleft_square],40
    mov [hleft_square],19
    push xleft_square
    push yleft_square
    push wleft_square
    push hleft_square
+   call blank_square 
+      
+   mov [xright_square],210
+   mov [yright_square],110
+   mov [wright_square],40
+   mov [hright_square],19
+   push xright_square
+   push yright_square
+   push wright_square
+   push hright_square
    call blank_square
    
    Redraw:
@@ -663,27 +664,27 @@ moving:
    mov [color],14
    call drawline 
     
-   push xright_square
-   push yright_square
-   push wright_square
-   push hright_square
-   mov [color],0h 
-   call blank_square
-   mov ax,x
-   xor ah,ah
-   add xright_square,ax
-   push xright_square
-   push yright_square
-   push wright_square
-   push hright_square
-   mov [color],14 
-   call blank_square 
-   
-   
    push xleft_square
    push yleft_square
    push wleft_square
    push hleft_square
+   mov [color],0h 
+   call blank_square
+   mov ax,x
+   xor ah,ah
+   add xleft_square,ax
+   push xleft_square
+   push yleft_square
+   push wleft_square
+   push hleft_square
+   mov [color],14 
+   call blank_square 
+   
+   
+   push xright_square
+   push yright_square
+   push wright_square
+   push hright_square
    mov [color],0h 
    call blank_square
    
@@ -692,11 +693,11 @@ moving:
    xor ah,ah
    div bl
    xor ah,ah
-   add yleft_square,ax
-   push xleft_square
-   push yleft_square
-   push wleft_square
-   push hleft_square
+   add yright_square,ax
+   push xright_square
+   push yright_square
+   push wright_square
+   push hright_square
    mov [color],14 
    call blank_square
    
@@ -718,7 +719,7 @@ moving:
    div bl
    xor ah,ah
    add al,v0
-   add ax,yleft_square
+   add ax,yright_square
    cmp ax,191
    jb moving    
    jmp exit
@@ -742,5 +743,6 @@ exit:
     INT 21H
 END start
 
+                   
          
 
