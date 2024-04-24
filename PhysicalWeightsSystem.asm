@@ -12,11 +12,11 @@ v1 db ?
 xx1 db 0
 xx2 db ?      ;
 
-msg1 db "enter m1 (3 digit,max number:255):","$"
-msg2 db 13,10,"enter m2 (3 digits,max number:255):","$"
-msg4 db 13,10,"enter meu1 (3 digits,max number:255):","$"
-msg3 db "a=0,No movement will occur","$" 
-
+msg1 db "enter m1 (2 digits):","$"
+msg2 db 13,10,"enter m2 (2 digits):","$"
+msg4 db 13,10,"enter meu1 (2 digits):","$"
+msg3 db "a=<0,No movement will occur","$" 
+msg5 db 13,10,"invalid input$"
  x_center dw ?         ;vars of circle
  y_center dw ?
  y_value dw 0
@@ -60,7 +60,7 @@ msg3 db "a=0,No movement will occur","$"
 	
 
 drawline proc
-        push BP     ; save BP on stack
+    push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
     
     mov cx, [bp+8]
@@ -98,7 +98,8 @@ column: mov ah, 0ch    ; put pixel
 drawcolumn endp
 
 circle proc
- 
+push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP   
 ;==========================
  mov bx, x_value
  mov ax,2
@@ -205,6 +206,7 @@ condition2:
 
  
 end:
+pop bp
 ret
  circle endp 
  
@@ -268,6 +270,7 @@ u4: mov ah, 0ch    ; put pixel
          
     POP BP          ; restore BP from stack
     RET 8           ; return from the function and clean up the stack 
+  
     blank_square endp
   
   
@@ -385,7 +388,10 @@ Endm
 ;		 Color                        
 ; output: line on the screen                  
 ;---------------------------------------------
-PROC DrawLine2D
+PROC DrawLine2D 
+    push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP  
+    
 	mov cx, [point1X]
 	sub cx, [point2X]
 	absolute cx
@@ -438,6 +444,7 @@ DrawLine2DpNxt2:
 	
 	
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	pop bp
 	ret
 ENDP DrawLine2D
 ;-----------------------------------------------
@@ -467,28 +474,35 @@ start:
     lea dx, msg1
     mov ah, 09h
     int 21h
-    mov cx,3         ;show msg1
+    mov cx,2         ;show msg1
 input_m1:
 	mov ah, 01h
-	int 21h
+	int 21h 
+    cmp al,30h
+    jb error2
+    cmp al,39h 
+    ja error2
 	sub al,30h
+    mov m1,al
 	mov dl,al
 	mov al,byte ptr m1
     mov bl,10
     mul bl
     xor ah,ah
     add ax,dx
-    mov m1,al
     loop input_m1
-    
 output_m2:    
     lea dx, msg2
     mov ah, 09h
     int 21h
-    mov cx,3          ;show msg1
+    mov cx,2          ;show msg1
 input_m2:
 	mov ah, 01h
 	int 21h
+	cmp al,30h
+    jb error2
+    cmp al,39h 
+    ja error2
 	sub al,30h
 	mov dl,al
 	mov al,byte ptr m2
@@ -498,15 +512,18 @@ input_m2:
     add ax,dx
     mov m2,al
     loop input_m2
-	
 output_meu1:	
 	lea dx, msg4
     mov ah, 09h
     int 21h
-    mov cx,3          ;show msg4
+    mov cx,2          ;show msg4
 input_meu1:                                
 	mov ah, 01h
 	int 21h
+	cmp al,30h
+    jb error2
+    cmp al,39h 
+    ja error2
 	sub al,30h
 	mov dl,al
 	mov al,byte ptr meu1
@@ -516,17 +533,20 @@ input_meu1:
     add ax,dx
     mov meu1,al
     loop input_meu1
-	
+
+    
     mov al,m2
     mov bl,10
     mul bl
-    mov dl,al
+    mov dx,ax
     mov al,m1
     mul bl
     mov bl,meu1
     mul bl
-    sub dl,al
-    mov al,dl
+    cmp ax,dx
+    ja minus
+    sub dx,ax
+    mov ax,dx
     mov bl,m1
     add bl,m2
     idiv bl
@@ -537,8 +557,9 @@ input_meu1:
     mov bl,m2
     mul bl
     mov t1,al
-    
-    
+    jmp drawing
+minus:
+mov a,0    
     
 
     
@@ -633,7 +654,7 @@ moving:
    mov [color],0h
    call drawline
    
-      mov dx,x 
+   mov dx,x 
    add xline,dx
    sub wline,dx
    push xline
@@ -659,7 +680,6 @@ moving:
    call blank_square 
    
    
-   
    push xleft_square
    push yleft_square
    push wleft_square
@@ -667,7 +687,11 @@ moving:
    mov [color],0h 
    call blank_square
    
-   mov ax,x
+   mov al,byte ptr x
+   mov bl,2
+   xor ah,ah
+   div bl
+   xor ah,ah
    add yleft_square,ax
    push xleft_square
    push yleft_square
@@ -676,7 +700,11 @@ moving:
    mov [color],14 
    call blank_square
    
-   mov ax,x
+    mov al,byte ptr x
+   mov bl,2
+   xor ah,ah
+   div bl
+   xor ah,ah
    add hcolumn,ax
    push xcolumn
    push ycolumn
@@ -702,14 +730,17 @@ error1:
 	
 	lea dx, msg3
     mov ah, 09h
+    int 21h
+    jmp exit
+error2:
+    lea dx, msg5
+    mov ah, 09h
     int 21h 
 exit:      
     ; exit program
     MOV AH, 4CH
     INT 21H
 END start
-
-                   
 
          
 
