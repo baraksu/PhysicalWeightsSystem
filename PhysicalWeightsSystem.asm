@@ -9,8 +9,7 @@ meu1 db 0
 a db ?
 v0 db 0
 v1 db ?
-xx1 db 0
-xx2 db ?      ;
+  ;
 
 msg1 db "enter m1 (2 digits):","$"
 msg2 db 13,10,"enter m2 (2 digits):","$"
@@ -688,11 +687,7 @@ moving:
    mov [color],0h 
    call blank_square
    
-   mov al,byte ptr x
-   mov bl,2
-   xor ah,ah
-   div bl
-   xor ah,ah
+   mov ax,x
    add yright_square,ax
    push xright_square
    push yright_square
@@ -701,21 +696,17 @@ moving:
    mov [color],14 
    call blank_square
    
-    mov al,byte ptr x
-   mov bl,2
-   xor ah,ah
-   div bl
-   xor ah,ah
+   mov ax,x
    add hcolumn,ax
    push xcolumn
    push ycolumn
    push hcolumn
-   call drawcolumn   
+   call drawcolumn
    mov al,a
-   add v0,al
+   add v0,al   
    mov al,a
-   mov bl,2
    xor ah,ah
+   mov bl,2
    div bl
    xor ah,ah
    add al,v0
@@ -743,6 +734,7 @@ exit:
     INT 21H
 END start
 
-                   
+ 
+         
          
 
