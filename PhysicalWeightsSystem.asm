@@ -59,12 +59,14 @@ msg5 db 13,10,"invalid input$"               ;הודעה שמוצגת על המ�
 	
 
 drawline proc
+;color,wline,;yline,xline:טענת כניסה
+;טענת יציאה:הפונקציה מציירת קו ישר בהתאם לפרמטרים שהוכנסו אליה
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
     
     mov cx, [bp+8]
     add cx,[bp+4]  ; column
-    mov dx, [bp+6]     ; ro
+    mov dx, [bp+6]     ; row
     mov al, [color]    
 line: mov ah, 0ch    ; put pixel
     int 10h
@@ -78,6 +80,8 @@ line: mov ah, 0ch    ; put pixel
 drawline endp
 
 drawcolumn proc
+;color,wcolumn,;ycolumn,xcolumn:טענת כניסה
+;טענת יציאה:הפונקציה מציירת עמודה ישרה בהתאם לפרמטרים שהוכנסו אליה
             push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP   
     
