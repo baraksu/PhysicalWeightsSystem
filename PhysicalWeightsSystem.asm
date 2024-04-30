@@ -2,49 +2,48 @@
 .STACK 100h
 
 .DATA
-m1 db 0     ;main vars
-m2 db 0
-t1 db 0
-meu1 db 0
-a db ?
-v0 db 0
-v1 db ?
+m1 db 0     ;מייצג את המסה של הגוף השמאלי במערכת
+m2 db 0     ;מייצג את המסה של הגוף הימני במערכת  
+meu1 db 0   ; מייצג את מקדם החיכוך של הגוף השמאלי במערכת
+a db ?      ;מייצג את התאוצה של המערכת
+v0 db 0     ;מייצג את המהירות בכל שנייה של המערכת (מתעדכן בכל סיבוב של תנועה של המערכת)
+
   ;
 
-msg1 db "enter m1 (2 digits):","$"
-msg2 db 13,10,"enter m2 (2 digits):","$"
-msg4 db 13,10,"enter meu1 (2 digits):","$"
-msg3 db "a=<0,No movement will occur","$" 
-msg5 db 13,10,"invalid input$"
- x_center dw ?         ;vars of circle
- y_center dw ?
- y_value dw 0
- x_value dw ? ;r
- decision dw 0
- color db ? ;1=blue    ;
+msg1 db "enter m1 (2 digits):","$"          ;הודעה שמוצגת על המסך לפני קליטת מסה 1
+msg2 db 13,10,"enter m2 (2 digits):","$"    ;הודעה שמוצגת על המסך לפני קליטת מסה 2
+msg4 db 13,10,"enter meu1 (2 digits):","$"  ;הודעה שמוצגת על המסך לפני קליטת מיו 1
+msg3 db "a=<0,No movement will occur","$"   ;הודעה שמוצגת על המסך במקרה שהתאוצה קטנה או שווה ל0
+msg5 db 13,10,"invalid input$"               ;הודעה שמוצגת על המסך במקרה והקלט לא תקין
+ x_center dw ?         ;של מרכז המעגל X 
+ y_center dw ?         ;של מרכז המעגל Y
+ y_value dw 0          ;של הנקודה המצוירת Y					
+ x_value dw ?          ;רדיוס המעגל
+ decision dw 0         ;ההחלטה בכל סיבוב של ציור פיקסל (האם לצייר למעלה או הצידה)
+ color db ? ;1=blue    ;צבע הגוף המצויר
  
-    x1 dw ?           ;blank circle vars
-    y1 dw ?
-    w dw ?
-    h dw ?            ;
+    x1 dw ?           ;של המרובע הגדול (הבסיס שעליו יושב המרובע הימני)  X 
+    y1 dw ?           ;של המרובע הגדול (הבסיס שעליו יושב המרובע הימני)  Y
+    w dw ?            ;הרוחב של המרובע הגדול (הבסיס שעליו יושב המרובע הימני)  
+    h dw ?            ;הגובה של המרובע הגדול (הבסיס שעליו יושב המרובע הימני) 
     
-    xline dw ?
-    yline dw ?
-    wline dw ?
+    xline dw ?        ;של "החבל" שמחבר בין המסה השמאלית לגלגלת X 
+    yline dw ?        ;של "החבל" שמחבר בין המסה השמאלית לגלגלת Y
+    wline dw ?        ;אורך "החבל" שמחבר בין המסה השמאלית לגלגלת 
     
-    xcolumn dw ?
-    ycolumn dw ?
-    hcolumn dw ?
+    xcolumn dw ?      ;של "החבל" שמחבר בין המסה הימנית לגלגלת X 
+    ycolumn dw ?      ;של "החבל" שמחבר בין המסה הימנית לגלגלת Y
+    hcolumn dw ?      ;אורך "החבל" שמחבר בין המסה השמאלית לגלגלת 
     
-    xleft_square dw ?
-    yleft_square dw ?
-    wleft_square dw ?
-    hleft_square dw ?   
+    xleft_square dw ? ;של המסה השמאלית X 
+    yleft_square dw ? ;של המסה השמאלית Y 
+    wleft_square dw ? ;אורך המסה השמאלית 
+    hleft_square dw ? ;גובה המסה השמאלית  
     
-    xright_square dw ?
-    yright_square dw ?
-    wright_square dw ?
-    hright_square dw ?  
+    xright_square dw ? ;של המסה הימנית X 
+    yright_square dw ? ;של המסה הימנית Y 
+    wright_square dw ? ;אורך המסה הימנית 
+    hright_square dw ? ;גובה המסה הימנית  
     
     TempW dw ?        ;diagonal line Vars
     pointX dw ? 
@@ -551,12 +550,7 @@ input_meu1:
     add bl,m2
     div bl
     mov a,al
-    
-    mov al,10
-    sub al,a
-    mov bl,m2
-    mul bl
-    mov t1,al
+
     jmp drawing
 minus:
 mov a,0    
