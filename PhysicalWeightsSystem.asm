@@ -101,6 +101,8 @@ column: mov ah, 0ch    ; put pixel
 drawcolumn endp
 
 circle proc
+;color,decision,y_value,x_value,y_center,x_center:טענת כניסה
+;טענת יציאה:הפונקציה מציירת עיגול בהתאם לפרמטרים שהוכנסו אליה
 push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP   
 ;==========================
@@ -214,7 +216,8 @@ ret
  circle endp 
  
   blank_square proc  
-    
+  ;אורך צלע הריבוע, גובה הריבוע,קודקוד ימני עליון של הריבוע y,קודקוד ימני עליון של הריבוע x:טענת כניסה 
+  ;טענת יציאה:הפונקציה מציירת ריבוע חלול בהתאם לפרמטרים שהוכנסו אליה
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
      
