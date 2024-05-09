@@ -2,65 +2,72 @@
 .STACK 100h
 
 .DATA
-m1 db 0     ;מייצג את המסה של הגוף השמאלי במערכת
-m2 db 0     ;מייצג את המסה של הגוף הימני במערכת  
-meu1 db 0   ; מייצג את מקדם החיכוך של הגוף השמאלי במערכת
-a db ?      ;מייצג את התאוצה של המערכת
-v0 db 0     ;מייצג את המהירות בכל שנייה של המערכת (מתעדכן בכל סיבוב של תנועה של המערכת)
-
+m1 db 0     ;main vars
+m2 db 0
+t1 db 0
+meu1 db 0
+a db ?
+v0 db 0
+v1 db ?
   ;
 
-msg1 db "enter m1 (2 digits):","$"          ;הודעה שמוצגת על המסך לפני קליטת מסה 1
-msg2 db 13,10,"enter m2 (2 digits):","$"    ;הודעה שמוצגת על המסך לפני קליטת מסה 2
-msg4 db 13,10,"enter meu1 (2 digits):","$"  ;הודעה שמוצגת על המסך לפני קליטת מיו 1
-msg3 db "a=<0,No movement will occur","$"   ;הודעה שמוצגת על המסך במקרה שהתאוצה קטנה או שווה ל0
-msg5 db 13,10,"invalid input$"               ;הודעה שמוצגת על המסך במקרה והקלט לא תקין
+msg1 db "enter m1 (2 digits):","$"
+msg2 db 13,10,"enter m2 (2 digits):","$"
+msg4 db 13,10,"enter meu1 (2 digits):","$"
+msg3 db "a=<0,No movement will occur","$" 
+msg5 db 13,10,"invalid input$"                                                
+msg6 dw 13,10, "#######  ######   ##       #######  ######            ##   ##" ,13,10, "##         ##     ##            ##       ##           ## # ##" ,13,10, "##   ##    ##     ##       #######  ##   ##           #######" ,13,10, "##    #    ##     ##   ##  ##   ##  ##   ##           ### ###" ,13,10, "#######  ######   #######  ##   ##  ######            ##   ##$"13,10, 
+msg7 dw 13,10,13,10,13,10,13,10, "#######  ##   ##  ##   ##  #######  ######   #######  #######  ##"      ,13,10, "##   ##  ##   ##  ##   ##  ##         ##     ##       ##   ##  ##      ",13,10, "#######  #######  #######  #######    ##     ##       #######  ##      ",13,10, "##       ##   ##       ##       ##    ##     ##       ##   ##  ##   ## ",13,10, "##       ##   ##  #######  #######  ######   #######  ##   ##  #######$" 
+msg8 dw 13,10,13,10,"##   ##  #######  ######   #######  ##   ## ########  #######" ,13,10, "## # ##  ##         ##     ##       ##   ##    ##     ##     " ,13,10, "#######  ####       ##     ##   ##  #######    ##     #######" ,13,10, "### ###  ##         ##     ##    #  ##   ##    ##          ##" ,13,10, "##   ##  #######  ######   #######  ##   ##    ##     #######$" 
+msg9 dw 13,10,13,10,"#######  ##   ##  ####### ########  #######  ##   ##"          ,13,10,"##       ##   ##  ##         ##     ##       ### ###"           ,13,10,"#######  #######  #######    ##     ####     #######"           ,13,10,"     ##       ##       ##    ##     ##       ## # ##"       ,13,10,"#######  #######  #######    ##     #######  ##   ##" 
+crlf dw "                                                                                     $"
 
- x_center dw ?         ;של מרכז המעגל X 
- y_center dw ?         ;של מרכז המעגל Y
- y_value dw 0          ;של הנקודה המצוירת Y					
- x_value dw ?          ;רדיוס המעגל
- decision dw 0         ;ההחלטה בכל סיבוב של ציור פיקסל (האם לצייר למעלה או הצידה)
- color db ? ;1=blue    ;צבע הגוף המצויר
+ x_center dw ?         ;vars of circle
+ y_center dw ?
+ y_value dw 0
+ x_value dw ? ;r
+ decision dw 0
+ color db ? ;1=blue    ;
  
-    x1 dw ?           ;של המרובע הגדול (הבסיס שעליו יושב המרובע הימני)  X 
-    y1 dw ?           ;של המרובע הגדול (הבסיס שעליו יושב המרובע הימני)  Y
-    w dw ?            ;הרוחב של המרובע הגדול (הבסיס שעליו יושב המרובע הימני)  
-    h dw ?            ;הגובה של המרובע הגדול (הבסיס שעליו יושב המרובע הימני) 
+    x1 dw ?           ;blank circle vars
+    y1 dw ?
+    w dw ?
+    h dw ?            ;
     
-    xline dw ?        ;(משתנה בהתאם לאורך החבל בכל סיבוב של הלולאה) של "החבל" שמחבר בין המסה השמאלית לגלגלת X 
-    yline dw ?        ;של "החבל" שמחבר בין המסה השמאלית לגלגלת Y
-    wline dw ?        ;(משתנה בהתאם לאורך החבל בכל סיבוב של הלולאה) אורך "החבל" שמחבר בין המסה השמאלית לגלגלת 
+    xline dw ?
+    yline dw ?
+    wline dw ?
     
-    xcolumn dw ?      ;של "החבל" שמחבר בין המסה הימנית לגלגלת X 
-    ycolumn dw ?      ;(משתנה בהתאם לאורך החבל בכל סיבוב של הלולאה) של "החבל" שמחבר בין המסה הימנית לגלגלת Y
-    hcolumn dw ?      ;(משתנה בהתאם לאורך החבל בכל סיבוב של הלולאה) אורך "החבל" שמחבר בין המסה השמאלית לגלגלת 
+    xcolumn dw ?
+    ycolumn dw ?
+    hcolumn dw ?
     
-    xleft_square dw ? (משתנה בהתאם למיקום הגוף בכל סיבוב של הלולאה) ;של המסה השמאלית X 
-    yleft_square dw ? ;של המסה השמאלית Y 
-    wleft_square dw ? ;אורך המסה השמאלית 
-    hleft_square dw ? ;גובה המסה השמאלית  
+    xleft_square dw ?
+    yleft_square dw ?
+    wleft_square dw ?
+    hleft_square dw ?   
     
-    xright_square dw ? ;של המסה הימנית X 
-    yright_square dw ? ;(משתנה בהתאם למיקום הגוף בכל סיבוב של הלולאה) של המסה הימנית Y 
-    wright_square dw ? ;אורך המסה הימנית 
-    hright_square dw ? ;גובה המסה הימנית  
+    xright_square dw ?
+    yright_square dw ?
+    wright_square dw ?
+    hright_square dw ?  
     
-    TempW dw ?        ;
-    pointX dw ?       ;
-    pointY dw ?       ;
-    point1X dw ?      ;נקודת ההתחלה של הקו הישר X
-    point1Y dw ?      ;נקודת ההתחלה של הקו הישר Y
-    point2X dw ?      ;נקודת הסיום של הקו הישר X
-    point2Y dw ?      ;נקודת הסיום של הקו הישר Y
+    TempW dw ?        ;diagonal line Vars
+    pointX dw ? 
+    pointY dw ?
+    point1X dw ? 
+    point1Y dw ?
+    point2X dw ? 
+    point2Y dw ?
     
-    x dw ?            ;(משתנה בהתאם לחישוב המרחק בכל סיבוב של הלולאה) משתנה שמייצג מה המרחק שהגופים צריכים לעבור בכל סיבוב של הלולאה
+    x dw ?
 .CODE
 	
 
-drawline proc
-;color,wline,;yline,xline:טענת כניסה
-;טענת יציאה:הפונקציה מציירת קו ישר בהתאם לפרמטרים שהוכנסו אליה
+drawline proc 
+   ; של הנקודה השמאלית של הקו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה
+    
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
     
@@ -80,8 +87,9 @@ line: mov ah, 0ch    ; put pixel
 drawline endp
 
 drawcolumn proc
-;color,wcolumn,;ycolumn,xcolumn:טענת כניסה
-;טענת יציאה:הפונקציה מציירת עמודה ישרה בהתאם לפרמטרים שהוכנסו אליה
+   ; של הנקודה העליונה של הקו ואת גובהו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+   ;טענת יציאה: הפונקציה מציירת קו ישר אנכי בהתאם למה שהוכנס אליה
+
             push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP   
     
@@ -101,8 +109,8 @@ column: mov ah, 0ch    ; put pixel
 drawcolumn endp
 
 circle proc
-;color,decision,y_value,x_value,y_center,x_center:טענת כניסה
-;טענת יציאה:הפונקציה מציירת עיגול בהתאם לפרמטרים שהוכנסו אליה
+   ;של כל נקודה שהעיגול אמור לצבוע ואת הצבע Yוה Xשל מרכז המעגל ואת ערך ה Yוה  Xהפונקציה מקבלת כמשתנים את ערכי ה
+   ;טענת יציאה: הפונקציה מציירת עיגול בהתאם למה שהוכנס אליה
 push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP   
 ;==========================
@@ -216,8 +224,8 @@ ret
  circle endp 
  
   blank_square proc  
-  ;אורך צלע הריבוע, גובה הריבוע,קודקוד ימני עליון של הריבוע y,קודקוד ימני עליון של הריבוע x:טענת כניסה 
-  ;טענת יציאה:הפונקציה מציירת ריבוע חלול בהתאם לפרמטרים שהוכנסו אליה
+   ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+   ;טענת יציאה: הפונקציה מציירת ריבוע חלול בהתאם למה שהוכנס אליה 
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
      
@@ -471,18 +479,13 @@ ENDP PIXEL
  
 
 
-
-
-start:
-    MOV AX, @DATA   ; initialize data segment
-    MOV DS, AX
-    
-    lea dx, msg1
-    mov ah, 09h
-    int 21h
-    mov cx,2         ;show msg1
-input_m1:
-	mov ah, 01h
+proc input  
+   ; טענת כניסה: הפונקציה מקבלת כפרמטר את ערך האופסט של המשתנה שעליו מוכנס ערך היציאה 
+   ;טענת יציאה: הפונקציה קולטת מספר דו ספרתי ומכניסה למקום בזיכרון של הערך שהתקבל כפרמטר
+    push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP     
+        
+    mov ah, 01h
 	int 21h
 	cmp al,30h
     jb error2
@@ -490,56 +493,99 @@ input_m1:
     ja error2
 	sub al,30h
 	mov dl,al
-	mov al,byte ptr m1
-    mov bl,10
-    mul bl
-    xor ah,ah
-    add ax,dx
-    mov m1,al
-    loop input_m1
+    mov cl,10
+    mul cl
+    mov bx,[bp+4]
+    mov [bx],al          
+    
+        mov ah, 01h
+    int 21h
+    cmp al,30h
+    jb error2
+    cmp al,39h 
+    ja error2
+	sub al,30h
+	add [bx],al
+	
+	
+    pop bp     
+    ret 2
+endp input
+start:
+    MOV AX, @DATA   ; initialize data segment
+    MOV DS, AX
+    lea dx, msg6
+    mov ah, 09h
+    int 21h
+    
+     
+    mov cx,15
+loopp:
+
+    lea dx, crlf
+    mov ah, 09h
+    int 21h 
+loop loopp
+
+    
+    mov ah,06
+mov al,00
+mov bh,07
+mov ch,00
+mov cl,00
+mov dh,24
+mov dl,79
+int 10h
+
+    	mov dh, 0
+	mov dl, 0
+	mov bh, 0
+	mov ah, 2
+	int 10h
+
+
+    lea dx, msg7
+    mov ah, 09h
+    int 21h    
+
+    lea dx, msg8
+    mov ah, 09h
+    int 21h
+    
+        lea dx, msg9
+    mov ah, 09h
+    int 21h
+    
+    	mov dh, 0
+	mov dl, 0
+	mov bh, 0
+	mov ah, 2
+	int 10h
+	
+    lea dx, msg1
+    mov ah, 09h
+    int 21h
+    mov cx,2         ;show msg1
+input_m1:
+    push offset m1
+    call input
+     
 output_m2:    
     lea dx, msg2
     mov ah, 09h
     int 21h
     mov cx,2          ;show msg1
 input_m2:
-	mov ah, 01h
-	int 21h
-	cmp al,30h
-    jb error2
-    cmp al,39h 
-    ja error2
-	sub al,30h
-	mov dl,al
-	mov al,byte ptr m2
-    mov bl,10
-    mul bl
-    xor ah,ah
-    add ax,dx
-    mov m2,al
-    loop input_m2
+    push offset m2
+    call input
 output_meu1:	
 	lea dx, msg4
     mov ah, 09h
     int 21h
     mov cx,2          ;show msg4
 input_meu1:                                
-	mov ah, 01h
-	int 21h
-	cmp al,30h
-    jb error2
-    cmp al,39h 
-    ja error2
-	sub al,30h
-	mov dl,al
-	mov al,byte ptr meu1
-    mov bl,10
-    mul bl
-    xor ah,ah
-    add ax,dx
-    mov meu1,al
-    loop input_meu1
-
+    push offset meu1
+    call input
     
     mov al,m2
     mov bl,10
@@ -558,7 +604,12 @@ input_meu1:
     add bl,m2
     div bl
     mov a,al
-
+    
+    mov al,10
+    sub al,a
+    mov bl,m2
+    mul bl
+    mov t1,al
     jmp drawing
 minus:
 mov a,0    
@@ -735,8 +786,3 @@ exit:
     MOV AH, 4CH
     INT 21H
 END start
-
- 
-         
-         
-
