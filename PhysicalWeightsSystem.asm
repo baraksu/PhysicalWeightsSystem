@@ -21,6 +21,13 @@ msg7 dw 13,10,13,10,13,10,13,10, "#######  ##   ##  ##   ##  #######  ######   #
 msg8 dw 13,10,13,10,"##   ##  #######  ######   #######  ##   ## ########  #######" ,13,10, "## # ##  ##         ##     ##       ##   ##    ##     ##     " ,13,10, "#######  ####       ##     ##   ##  #######    ##     #######" ,13,10, "### ###  ##         ##     ##    #  ##   ##    ##          ##" ,13,10, "##   ##  #######  ######   #######  ##   ##    ##     #######$" 
 msg9 dw 13,10,13,10,"#######  ##   ##  ####### ########  #######  ##   ##"          ,13,10,"##       ##   ##  ##         ##     ##       ### ###"           ,13,10,"#######  #######  #######    ##     ####     #######"           ,13,10,"     ##       ##       ##    ##     ##       ## # ##"       ,13,10,"#######  #######  #######    ##     #######  ##   ##" 
 crlf dw "                                                                                     $"
+msg11 dw "t=$"
+seconds db "00$"
+totalx db 0 
+msg12 db 10,"delta x now=$"
+xmsg db "00$"
+msg13 db 10,10,"delta x total=$"
+totalxmsg db "00$"
 
  x_center dw ?         ;vars of circle
  y_center dw ?
@@ -66,7 +73,7 @@ crlf dw "                                                                       
 
 drawline proc 
    ; של הנקודה השמאלית של הקו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
-   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה
+   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה    
     
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
@@ -87,9 +94,9 @@ line: mov ah, 0ch    ; put pixel
 drawline endp
 
 drawcolumn proc
+
    ; של הנקודה העליונה של הקו ואת גובהו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
    ;טענת יציאה: הפונקציה מציירת קו ישר אנכי בהתאם למה שהוכנס אליה
-
             push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP   
     
@@ -224,8 +231,8 @@ ret
  circle endp 
  
   blank_square proc  
-   ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
-   ;טענת יציאה: הפונקציה מציירת ריבוע חלול בהתאם למה שהוכנס אליה 
+      ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+   ;טענת יציאה: הפונקציה מציירת ריבוע חלול בהתאם למה שהוכנס אליה  
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
      
@@ -477,10 +484,9 @@ PROC PIXEL
 ENDP PIXEL
 
  
-
-
-proc input  
-   ; טענת כניסה: הפונקציה מקבלת כפרמטר את ערך האופסט של המשתנה שעליו מוכנס ערך היציאה 
+         
+proc input 
+   ; טענת כניסה: הפונקציה מקבלת כפרמטר את ערך ההיסט של המשתנה שאליו מוכנס הערך  
    ;טענת יציאה: הפונקציה קולטת מספר דו ספרתי ומכניסה למקום בזיכרון של הערך שהתקבל כפרמטר
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
@@ -511,6 +517,28 @@ proc input
     pop bp     
     ret 2
 endp input
+
+proc convert2dignum
+; טענת כניסה:הפונקציה מקבלת כפרמטרים מספר והיסט של ההודעה שאליו תוכנס המספר
+; טענת יציאה:הפונקציה ממירה מספר דו ספרתי להודעה בהתאם
+
+       push BP     ; save BP on stack
+    mov BP, SP  ; set BP to current SP     
+      
+   mov al,[bp+6]
+   xor ah,ah
+   mov cl,10
+   div cl
+   add al,30h
+   add ah,30h
+   mov bx,[bp+4]
+   mov [bx+1],ah
+   mov [bx],al
+   
+   pop bp
+   ret 4
+endp convert2dignum
+
 start:
     MOV AX, @DATA   ; initialize data segment
     MOV DS, AX
@@ -528,17 +556,17 @@ loopp:
 loop loopp
 
     
-    mov ah,06
-mov al,00
-mov bh,07
-mov ch,00
-mov cl,00
-mov dh,24
-mov dl,79
-int 10h
+    mov ah,06      ;מנקה את המסך
+    mov al,00
+    mov bh,07
+    mov ch,00
+    mov cl,00
+    mov dh,24
+    mov dl,79
+    int 10h
 
-    	mov dh, 0
-	mov dl, 0
+    mov dh, 0	;קובע את מיקום הסמן
+	mov dl, 0	
 	mov bh, 0
 	mov ah, 2
 	int 10h
@@ -587,7 +615,7 @@ input_meu1:
     push offset meu1
     call input
     
-    mov al,m2
+    mov al,m2	;חישוב התאוצה
     mov bl,10
     mul bl
     mov cx,ax
@@ -605,11 +633,7 @@ input_meu1:
     div bl
     mov a,al
     
-    mov al,10
-    sub al,a
-    mov bl,m2
-    mul bl
-    mov t1,al
+
     jmp drawing
 minus:
 mov a,0    
@@ -620,7 +644,8 @@ mov a,0
      mov ah,0 ;subfunction 0
     mov al,13H ;select mode 13h 
     int 10h ;call graphics interrupt
-    
+            
+	 
     mov [x_center],230
     mov [y_center],90 
     mov [x_value],7  ;radius 
@@ -628,16 +653,18 @@ mov a,0
     mov [color],14
     call circle
  
-   mov [x1], 0
+   mov [x1],1 
    mov [y1], 100
-   mov [w],200
-   mov [h],99
+   mov [w],199
+   mov [h],98
    push x1
    push y1
    push w
    push h
    call blank_square 
- 
+    
+
+	
 	mov [point1X], 230
 	mov [point2X], 200
 	mov [point1Y], 90
@@ -694,13 +721,69 @@ mov a,0
 ;-------------------------------------------------
 cmp a,0
 je error1
-moving:
+moving: 
+
+    mov dh, 4
+	mov dl, 0
+	mov bh, 0
+	mov ah, 2
+	int 10h
+	
+    lea dx, msg11
+    mov ah, 09h
+    int 21h 
+    
+    lea dx, seconds
+    mov ah, 09h
+    int 21h 
+    
    mov al,a
    mov bl,2
    xor ah,ah
    div bl
    add al,v0
    mov byte ptr x,al
+      add totalx,al
+    
+    mov dh, 5
+	mov dl, 0
+	mov bh, 0
+	mov ah, 2
+	int 10h
+	   
+    
+   push x
+   push offset xmsg
+   call convert2dignum
+   
+    lea dx, msg12
+    mov ah, 09h
+    int 21h
+    
+    
+    lea dx, xmsg
+    mov ah, 09h
+    int 21h 
+   
+   
+   push word ptr totalx
+   push offset totalxmsg
+   call convert2dignum
+   
+    mov dh, 6
+	mov dl, 0
+	mov bh, 0
+	mov ah, 2
+	int 10h 
+	   
+    lea dx, msg13
+    mov ah, 09h
+    int 21h 
+    
+    lea dx, totalxmsg
+    mov ah, 09h
+    int 21h    
+   
    push xline
    push yline
    push wline
@@ -752,9 +835,18 @@ moving:
    mov ax,x
    add hcolumn,ax
    push xcolumn
-   push ycolumn
+   push ycolumn     
    push hcolumn
-   call drawcolumn
+   call drawcolumn   
+   
+   lea bx,seconds
+   inc [bx+1]
+   cmp [bx+1],"9"
+   jne cont  
+   mov [bx+1],"0"
+   inc [bx]
+   
+cont:   
    mov al,a
    add v0,al   
    mov al,a
@@ -764,7 +856,7 @@ moving:
    xor ah,ah
    add al,v0
    add ax,yright_square
-   cmp ax,191
+   cmp ax,201
    jb moving    
    jmp exit
    
@@ -781,7 +873,7 @@ error2:
     lea dx, msg5
     mov ah, 09h
     int 21h 
-exit:      
+exit:   
     ; exit program
     MOV AH, 4CH
     INT 21H
