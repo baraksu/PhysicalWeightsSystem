@@ -72,8 +72,8 @@ totalxmsg db "00$"
 	
 
 drawline proc 
-   ; של הנקודה השמאלית של הקו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
-   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה    
+     ; של הנקודה השמאלית של הקו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה      
     
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
@@ -94,7 +94,6 @@ line: mov ah, 0ch    ; put pixel
 drawline endp
 
 drawcolumn proc
-
    ; של הנקודה העליונה של הקו ואת גובהו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
    ;טענת יציאה: הפונקציה מציירת קו ישר אנכי בהתאם למה שהוכנס אליה
             push BP     ; save BP on stack
@@ -231,7 +230,7 @@ ret
  circle endp 
  
   blank_square proc  
-      ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+          ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
    ;טענת יציאה: הפונקציה מציירת ריבוע חלול בהתאם למה שהוכנס אליה  
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
@@ -518,10 +517,9 @@ proc input
     ret 2
 endp input
 
-proc convert2dignum
+proc convert2dignum 
 ; טענת כניסה:הפונקציה מקבלת כפרמטרים מספר והיסט של ההודעה שאליו תוכנס המספר
 ; טענת יציאה:הפונקציה ממירה מספר דו ספרתי להודעה בהתאם
-
        push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
       
@@ -556,7 +554,7 @@ loopp:
 loop loopp
 
     
-    mov ah,06      ;מנקה את המסך
+    mov ah,06      ;
     mov al,00
     mov bh,07
     mov ch,00
@@ -565,8 +563,8 @@ loop loopp
     mov dl,79
     int 10h
 
-    mov dh, 0	;קובע את מיקום הסמן
-	mov dl, 0	
+    mov dh, 0
+	mov dl, 0
 	mov bh, 0
 	mov ah, 2
 	int 10h
@@ -615,7 +613,7 @@ input_meu1:
     push offset meu1
     call input
     
-    mov al,m2	;חישוב התאוצה
+    mov al,m2
     mov bl,10
     mul bl
     mov cx,ax
@@ -841,14 +839,15 @@ moving:
    
    lea bx,seconds
    inc [bx+1]
-   cmp [bx+1],"9"
+   cmp [bx+1],":"
    jne cont  
    mov [bx+1],"0"
    inc [bx]
    
 cont:   
    mov al,a
-   add v0,al   
+   add v0,al
+      
    mov al,a
    xor ah,ah
    mov bl,2
@@ -856,7 +855,7 @@ cont:
    xor ah,ah
    add al,v0
    add ax,yright_square
-   cmp ax,201
+   cmp ax,181
    jb moving    
    jmp exit
    
