@@ -2,16 +2,15 @@
 .STACK 100h
 
 .DATA
-m1 db 0     ;main vars
-m2 db 0
-t1 db 0
-meu1 db 0
-a db ?
-v0 db 0
-v1 db ?
+m1 db 0     ;massa of m1
+m2 db 0	    ;massa of m2
+t1 db 0     ;t1
+meu1 db 0   ;meu
+a db ?      ;a of the system
+v0 db 0     ;v of the the previous second
   ;
 
-msg1 db "enter m1 (2 digits):","$"
+msg1 db "enter m1 (2 digits):","$"	;;Messages
 msg2 db 13,10,"enter m2 (2 digits):","$"
 msg4 db 13,10,"enter meu1 (2 digits):","$"
 msg3 db "a=<0,No movement will occur","$" 
@@ -22,42 +21,48 @@ msg8 dw 13,10,13,10,"##   ##  #######  ######   #######  ##   ## ########  #####
 msg9 dw 13,10,13,10,"#######  ##   ##  ####### ########  #######  ##   ##"          ,13,10,"##       ##   ##  ##         ##     ##       ### ###"           ,13,10,"#######  #######  #######    ##     ####     #######"           ,13,10,"     ##       ##       ##    ##     ##       ## # ##"       ,13,10,"#######  #######  #######    ##     #######  ##   ##" 
 crlf dw "                                                                                     $"
 msg11 dw "t=$"
-seconds db "00$"
-totalx db 0 
-msg12 db 10,"delta x now=$"
-xmsg db "00$"
-msg13 db 10,10,"delta x total=$"
-totalxmsg db "00$"
+seconds db "00$"  ;;;A message of a few seconds that the system is moving
+totalx db 0 ;;Calculate the distance the system has traveled
+msg12 db 10,"delta x now=$"	
+xmsg db "00$"	Delta X message now
+msg13 db 10,10,"delta x total=$"	
+totalxmsg db "00$"   ;Delta X message total
 
- x_center dw ?         ;vars of circle
- y_center dw ?
- y_value dw 0
- x_value dw ? ;r
+
+;vars of circle
+ x_center dw ?  ;x of the center of the circle
+ y_center dw ?	;y of the center of the circle
+ y_value dw 0	;y of the point of the circle
+ x_value dw ? ;radius of the circle
  decision dw 0
- color db ? ;1=blue    ;
- 
-    x1 dw ?           ;blank circle vars
-    y1 dw ?
-    w dw ?
-    h dw ?            ;
+
+
+ color db ? ;1=blue    ;color
+
+
+;blank circle vars
+    x1 dw ?  ;the x of the big square 
+    y1 dw ?  ;the Y of the big square 
+    w dw ?    ;the width of the big square    
+    h dw ?     ;the height of the big square        
     
-    xline dw ?
-    yline dw ?
-    wline dw ?
+    xline dw ?	 ;x of the line
+    yline dw ?   ;y of the line
+    wline dw ?	 ;width of the line
     
-    xcolumn dw ?
-    ycolumn dw ?
-    hcolumn dw ?
+    xcolumn dw ?  ;x of the column
+    ycolumn dw ?  ;y of the column
+    hcolumn dw ?  ;height of the column
     
-    xleft_square dw ?
-    yleft_square dw ?
-    wleft_square dw ?
-    hleft_square dw ?   
+    xleft_square dw ?   ;the x of the left square
+    yleft_square dw ?   ;the y of the left square
+    wleft_square dw ?   ;the  width of the left square  
+    hleft_square dw ?   ;the  height of the left square  
     
-    xright_square dw ?
-    yright_square dw ?
-    wright_square dw ?
-    hright_square dw ?  
+    xright_square dw ?   ;the x of the right square
+    yright_square dw ?   ;the y of the right square
+    wright_square dw ?   ;the width of the right square
+    hright_square dw ?   ;the height of the right square
     
     TempW dw ?        ;diagonal line Vars
     pointX dw ? 
@@ -72,8 +77,8 @@ totalxmsg db "00$"
 	
 
 drawline proc 
-     ; של הנקודה השמאלית של הקו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
-   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה      
+   ; של הנקודה השמאלית של הקו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה: הפונקציה מקבלת כפרמטר את ערך ה
+   ;טענת יציאה: הפונקציה מציירת קו ישר אופקי בהתאם למה שהוכנס אליה    
     
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
@@ -115,8 +120,10 @@ column: mov ah, 0ch    ; put pixel
 drawcolumn endp
 
 circle proc
+
    ;של כל נקודה שהעיגול אמור לצבוע ואת הצבע Yוה Xשל מרכז המעגל ואת ערך ה Yוה  Xהפונקציה מקבלת כמשתנים את ערכי ה
    ;טענת יציאה: הפונקציה מציירת עיגול בהתאם למה שהוכנס אליה
+
 push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP   
 ;==========================
@@ -230,7 +237,7 @@ ret
  circle endp 
  
   blank_square proc  
-          ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
+   ; של הנקודה השמאלית העליונה של הריבוע,את גובהו ואת אורכו ואת הצבע בתור משתנה Yוה Xטענת כניסה:הפונקציה מקבלת כפרמטר את ערך ה
    ;טענת יציאה: הפונקציה מציירת ריבוע חלול בהתאם למה שהוכנס אליה  
     push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
@@ -484,7 +491,7 @@ ENDP PIXEL
 
  
          
-proc input 
+proc input  
    ; טענת כניסה: הפונקציה מקבלת כפרמטר את ערך ההיסט של המשתנה שאליו מוכנס הערך  
    ;טענת יציאה: הפונקציה קולטת מספר דו ספרתי ומכניסה למקום בזיכרון של הערך שהתקבל כפרמטר
     push BP     ; save BP on stack
@@ -520,6 +527,7 @@ endp input
 proc convert2dignum 
 ; טענת כניסה:הפונקציה מקבלת כפרמטרים מספר והיסט של ההודעה שאליו תוכנס המספר
 ; טענת יציאה:הפונקציה ממירה מספר דו ספרתי להודעה בהתאם
+
        push BP     ; save BP on stack
     mov BP, SP  ; set BP to current SP     
       
@@ -537,13 +545,26 @@ proc convert2dignum
    ret 4
 endp convert2dignum
 
+proc delay
+	pusha
+	mov cx, 15h   ;High Word
+	mov dx, 8260h ;Low Word
+	mov ah, 86h   ;Wait
+	int 15h
+	popa
+	ret
+endp delay
+
+
 start:
     MOV AX, @DATA   ; initialize data segment
-    MOV DS, AX
+    MOV DS, AX  
+    
     lea dx, msg6
     mov ah, 09h
     int 21h
     
+    call delay
      
     mov cx,15
 loopp:
@@ -554,7 +575,7 @@ loopp:
 loop loopp
 
     
-    mov ah,06      ;
+    mov ah,06      ;מנקה את המסך
     mov al,00
     mov bh,07
     mov ch,00
@@ -563,7 +584,7 @@ loop loopp
     mov dl,79
     int 10h
 
-    mov dh, 0
+        mov dh, 0 ;משנה מיקום סמן
 	mov dl, 0
 	mov bh, 0
 	mov ah, 2
@@ -844,6 +865,8 @@ moving:
    mov [bx+1],"0"
    inc [bx]
    
+   call delay
+   
 cont:   
    mov al,a
    add v0,al
@@ -877,3 +900,4 @@ exit:
     MOV AH, 4CH
     INT 21H
 END start
+
